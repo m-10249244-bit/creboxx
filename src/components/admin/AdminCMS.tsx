@@ -137,7 +137,7 @@ export default function AdminCMS() {
             <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest opacity-40">Logo Asset</label>
               <div className="flex items-center gap-4 bg-white/60 border border-brand-border rounded-xl px-4 py-2">
-                 {config?.logoUrl && <img src={config.logoUrl} className="w-8 h-8 rounded-lg object-contain bg-neutral-900 p-1" alt="Logo" />}
+                 {config?.logoUrl && <img src={config.logoUrl} className="w-8 h-8 rounded-lg object-contain" alt="Logo" />}
                  <label className="flex-1 cursor-pointer">
                     <span className="text-[10px] font-bold opacity-30">Tap to upload...</span>
                     <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'logoUrl')} className="hidden" />

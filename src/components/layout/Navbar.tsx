@@ -18,7 +18,7 @@ export default function Navbar() {
                 <img 
                   src={config.logoUrl} 
                   alt={config.appName || 'CRE'} 
-                  className="w-10 h-10 object-contain rounded-xl p-1 bg-neutral-900 border border-black/10 transition-transform group-hover:scale-105" 
+                  className="w-10 h-10 object-contain transition-transform group-hover:scale-105" 
                 />
               ) : (
                 <div className="w-10 h-10 bg-black flex items-center justify-center rounded-xl border border-black transition-transform group-hover:scale-105">

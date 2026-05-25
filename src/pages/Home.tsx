@@ -144,10 +144,15 @@ export default function Home() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }} 
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full cursor-pointer"
                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-10" />
-                    <img src={curBanner.imageUrl} className="w-full h-full object-cover select-none pointer-events-none" alt="" />
+                    {curBanner.targetUrl ? (
+                      <Link to={curBanner.targetUrl} className="block w-full h-full">
+                        <img src={curBanner.imageUrl} className="w-full h-full object-cover select-none pointer-events-none" alt="" />
+                      </Link>
+                    ) : (
+                      <img src={curBanner.imageUrl} className="w-full h-full object-cover select-none pointer-events-none" alt="" />
+                    )}
                  </motion.div>
                </AnimatePresence>
 
@@ -156,53 +161,18 @@ export default function Home() {
                  <>
                    <button 
                      onClick={(e) => { e.stopPropagation(); setActiveBanner(prev => (prev - 1 + banners.length) % banners.length); }}
-                     className="absolute left-6 z-30 w-10 h-10 rounded-full bg-white/10 hover:bg-white/95 border border-white/20 text-white hover:text-black hover:scale-105 active:scale-95 flex items-center justify-center transition-all duration-300 pointer-events-auto"
+                     className="absolute left-6 z-30 w-10 h-10 rounded-full bg-white/30 hover:bg-white/95 border border-white/40 text-white hover:text-black hover:scale-105 active:scale-95 flex items-center justify-center transition-all duration-300 pointer-events-auto"
                    >
                      <span className="text-sm font-bold">←</span>
                    </button>
                    <button 
                      onClick={(e) => { e.stopPropagation(); setActiveBanner(prev => (prev + 1) % banners.length); }}
-                     className="absolute right-6 z-30 w-10 h-10 rounded-full bg-white/10 hover:bg-white/95 border border-white/20 text-white hover:text-black hover:scale-105 active:scale-95 flex items-center justify-center transition-all duration-300 pointer-events-auto"
+                     className="absolute right-6 z-30 w-10 h-10 rounded-full bg-white/30 hover:bg-white/95 border border-white/40 text-white hover:text-black hover:scale-105 active:scale-95 flex items-center justify-center transition-all duration-300 pointer-events-auto"
                    >
                      <span className="text-sm font-bold">→</span>
                    </button>
                  </>
                )}
-
-               {/* Banner Content Core */}
-               <div className="absolute inset-y-0 left-0 z-20 flex flex-col justify-center px-8 md:px-16 max-w-2xl select-none pointer-events-none">
-                 <div className="space-y-6 pointer-events-auto">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="inline-block bg-white text-black text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-black/10">
-                        ⚡ {curBanner.id.toUpperCase()} CAMPAIGN
-                      </span>
-                      {curBanner.countdown && <BannerCountdown endTime={curBanner.countdown} />}
-                    </div>
-
-                    <h1 className="text-4xl md:text-7xl font-serif-italic italic text-white leading-none tracking-tight">
-                      {curBanner.title}
-                    </h1>
-
-                    <p className="text-zinc-300 text-sm md:text-xs font-semibold max-w-md leading-relaxed">
-                      {curBanner.subtitle}
-                    </p>
-
-                    <div className="flex gap-4 pt-2">
-                       {curBanner.targetUrl ? (
-                         <Link to={curBanner.targetUrl} className="cre-button bg-brand-pink text-black border-2 border-brand-border h-12 px-8 text-xs font-black shadow-[4px_4px_0px_0px_#1a1a1a] hover:-translate-y-0.5 transition-all uppercase">
-                           Draw Now
-                         </Link>
-                       ) : (
-                         <button className="cre-button bg-brand-pink text-black border-2 border-brand-border h-12 px-8 text-xs font-black shadow-[4px_4px_0px_0px_#1a1a1a] hover:-translate-y-0.5 transition-all uppercase">
-                           Discover Collectible
-                         </button>
-                       )}
-                       <Link to="/warehouse" className="cre-button bg-white text-black border-2 border-brand-border h-12 px-8 text-xs font-bold hover:bg-zinc-50 transition-colors uppercase">
-                          Warehouse
-                       </Link>
-                    </div>
-                 </div>
-               </div>
 
                {/* Carousel dot indicators */}
                {banners.length > 1 && (
