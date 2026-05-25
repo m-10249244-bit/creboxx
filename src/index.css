@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-serif: "Playfair Display", serif;
+
+  --color-brand-blue: #E9F3FF;
+  --color-brand-pink: #FFF0F6;
+  --color-brand-accent-blue: #A5D8FF;
+  --color-brand-accent-pink: #FFDEE9;
+  --color-brand-border: #1A1A1A;
+
+  --radius-cre: 14px;
+}
+
+@layer base {
+  body {
+    @apply text-brand-border font-sans antialiased bg-[#F5F9FF];
+    background-image: linear-gradient(to bottom right, #E9F3FF, #FFF0F6, #F5F9FF);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Theme-specific background circles */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -100px;
+    left: -50px;
+    width: 400px;
+    height: 400px;
+    background: rgba(191, 219, 254, 0.3); /* blue-200/30 */
+    border-radius: 9999px;
+    filter: blur(100px);
+    z-index: -1;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -100px;
+    right: -50px;
+    width: 400px;
+    height: 400px;
+    background: rgba(251, 207, 232, 0.3); /* pink-200/30 */
+    border-radius: 9999px;
+    filter: blur(100px);
+    z-index: -1;
+  }
+}
+
+@utility cre-glass {
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+@utility cre-card {
+  @apply cre-glass rounded-[32px] transition-all duration-300;
+  box-shadow: 0 25px 50px -12px rgba(191, 219, 254, 0.2);
+}
+
+@utility cre-button {
+  @apply relative px-8 py-4 rounded-[14px] font-bold border-[1.5px] border-brand-border transition-all active:scale-[0.98] flex items-center justify-center gap-2 overflow-hidden bg-brand-accent-blue;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+@utility cre-button-primary {
+  @apply bg-brand-accent-blue hover:bg-[#99CEF5];
+}
+
+@utility cre-button-secondary {
+  @apply bg-brand-accent-pink hover:opacity-90;
+}
+
+@utility cre-button-outline {
+  @apply bg-white/40 backdrop-blur-md hover:bg-white/60;
+}
+
+@layer components {
+  .cre-card:hover {
+    @apply -translate-y-1 scale-[1.01] border-white/60;
+  }
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+

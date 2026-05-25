@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'm-10249244@moe-dl.edu.my'
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprints
+    function isValidUser(data) {
+      return data.uid == request.auth.uid 
+          && data.balance is number 
+          && data.balance >= 0
+          && data.keys().hasAll(['uid', 'balance'])
+          && data.uid.size() < 128; // Basic size check
+    }
+
+    function isValidUsername(data) {
+      return data.uid == request.auth.uid
+          && data.username is string
+          && data.lowercaseUsername is string
+          && data.lowercaseUsername == data.username.lower()
+          && data.username.size() >= 3 && data.username.size() <= 20;
+    }
+
+    function isValidOrder(data) {
+      return data.userId == request.auth.uid
+          && data.status in ['pending', 'processing', 'shipped', 'completed']
+          && data.items is list
+          && data.address is map
+          && data.createdAt == request.time;
+    }
+
+    function isValidInventoryItem(data) {
+      return data.userId == request.auth.uid
+          && isValidId(data.prizeId)
+          && isValidId(data.boxId)
+          && data.status in ['in_storage', 'shipped', 'exchanged']
+          && data.wonAt == request.time;
+    }
+
+    // Collection Rules
+    match /users/{userId} {
+      allow get: if isSignedIn(); // Allow searching for user profiles in admin/system
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'address', 'isBanned', 'note'])) 
+                   || isAdmin();
+    }
+
+    match /usernames/{username} {
+      allow get: if true; // Publicly check if username is taken
+      allow create: if isSignedIn() && isValidUsername(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidOrder(incoming());
+      allow update: if isAdmin();
+    }
+
+    match /balanceLogs/{logId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.type == 'registration_reward' && !exists(/databases/$(database)/documents/balanceLogs/$(logId))); 
+      // Registration reward is tricky to protect purely via rules without a backend, 
+      // but we can at least ensure users only write their own. 
+      // For more security, we'd use a server function. 
+      // For now, we allow admin to do everything.
+    }
+
+    match /topupRequests/{requestId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    match /adminLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow read: if true;
+    }
+
+    match /boxes/{boxId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /boxes/{boxId}/prizes/{prizeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /inventory/{itemId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidInventoryItem(incoming());
+      allow update: if (isSignedIn() && existing().userId == request.auth.uid 
+                       && incoming().diff(existing()).affectedKeys().hasOnly(['status']))
+                    || isAdmin();
+    }
+
+    match /draws/{drawId} {
+      allow list: if true; // Public feed
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && incoming().timestamp == request.time;
+    }
+
+    // For the demo user specified in metadata
+    match /admins/m-10249244@moe-dl.edu.my {
+      allow read: if true;
+    }
+  }
+}

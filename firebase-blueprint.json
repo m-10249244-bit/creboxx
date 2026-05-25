@@ -1,0 +1,204 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Store user metadata and balances",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "balance": { "type": "number" },
+        "points": { "type": "number" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "balance"]
+    },
+    "Box": {
+      "title": "Blind Box",
+      "description": "Mystery box product",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "coverImage": { "type": "string" },
+        "description": { "type": "string" },
+        "rarityDistribution": { "type": "object" },
+        "pityThreshold": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "sold_out", "coming_soon"] },
+        "tags": { "type": "array" }
+      }
+    },
+    "Prize": {
+      "title": "Prize Item",
+      "description": "Individual items inside a box",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "boxId": { "type": "string" },
+        "name": { "type": "string" },
+        "image": { "type": "string" },
+        "rarity": { "type": "string", "enum": ["Common", "Rare", "Epic", "Secret"] },
+        "value": { "type": "number" },
+        "probability": { "type": "number" }
+      }
+    },
+    "InventoryItem": {
+      "title": "User Prize",
+      "description": "Prizes owned by a user in their warehouse",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "prizeId": { "type": "string" },
+        "boxId": { "type": "string" },
+        "status": { "type": "string", "enum": ["in_storage", "shipped", "exchanged"] },
+        "wonAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "DrawRecord": {
+      "title": "Draw History",
+      "description": "Log of every draw for analytics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userDisplayName": { "type": "string" },
+        "boxId": { "type": "string" },
+        "prizeId": { "type": "string" },
+        "prizeName": { "type": "string" },
+        "rarity": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "BalanceLog": {
+      "title": "Balance Transaction",
+      "description": "Log of balance changes for a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["topup", "draw", "admin_grant", "registration_reward", "refund"] },
+        "reason": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "relatedId": { "type": "string" }
+      }
+    },
+    "TopupRequest": {
+      "title": "Manual Topup Receipt",
+      "description": "User uploaded proof of payment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "method": { "type": "string" },
+        "proofUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "rejectReason": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "reviewedAt": { "type": "string", "format": "date-time" },
+        "reviewedBy": { "type": "string" }
+      }
+    },
+    "AdminLog": {
+      "title": "Admin Audit Log",
+      "description": "Audit trail of management actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "adminId": { "type": "string" },
+        "adminName": { "type": "string" },
+        "action": { "type": "string" },
+        "targetId": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SiteConfig": {
+      "title": "Website Configuration",
+      "description": "CMS and global settings",
+      "type": "object",
+      "properties": {
+        "appName": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "maintenanceMode": { "type": "boolean" },
+        "registrationReward": { "type": "number" },
+        "registrationRewardLimit": { "type": "number" },
+        "registrationRewardCount": { "type": "number" },
+        "homepageBlocks": { "type": "array" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and wallet"
+    },
+    "/balanceLogs/{logId}": {
+      "schema": "BalanceLog",
+      "description": "Transaction history"
+    },
+    "/topupRequests/{requestId}": {
+      "schema": "TopupRequest",
+      "description": "Payment proof for review"
+    },
+    "/adminLogs/{logId}": {
+      "schema": "AdminLog",
+      "description": "System audit trail"
+    },
+    "/settings/config": {
+      "schema": "SiteConfig",
+      "description": "Global CMS settings"
+    },
+    "/boxes/{boxId}": {
+      "schema": "Box",
+      "description": "Box details"
+    },
+    "/boxes/{boxId}/prizes/{prizeId}": {
+      "schema": "Prize",
+      "description": "Prizes in a specific box"
+    },
+    "/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Global inventory tracked by userId field"
+    },
+    "/usernames/{username}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "uid": { "type": "string" },
+          "username": { "type": "string" },
+          "lowercaseUsername": { "type": "string" }
+        }
+      },
+      "description": "Mapping from username to UID"
+    },
+    "/orders/{orderId}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string" },
+          "userName": { "type": "string" },
+          "items": { "type": "array" },
+          "address": { "type": "object" },
+          "postage": { "type": "number" },
+          "totalAmount": { "type": "number" },
+          "status": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "description": "Shipping orders for physical items"
+    },
+    "/draws/{drawId}": {
+      "schema": "DrawRecord",
+      "description": "Real-time draw feed"
+    }
+  }
+}

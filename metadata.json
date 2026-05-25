@@ -1,0 +1,8 @@
+{
+  "name": "CRE - High-End Mystery Box Platform",
+  "description": "A premium online blind box experience with high-end toy brand aesthetics, immersive animations, and real-time rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
